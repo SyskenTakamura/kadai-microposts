@@ -58,9 +58,17 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
     }
 
+    /**
+     * お気に入りの一覧を取得する
+     */
+    public function favoriteings()
+    {
+        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
+    }
+
     public function loadRelationshipCounts()
     {
-        $this->loadCount(['microposts', 'followings', 'followers']);
+        $this->loadCount(['microposts', 'followings', 'followers', 'favoriteings']);
     }
 
     /**
@@ -132,5 +140,47 @@ class User extends Authenticatable
         $userIds[] = $this->id;
         // それらのユーザが所有する投稿に絞り込む
         return Micropost::whereIn('user_id', $userIds);
+    }
+
+    
+    /**
+     * お気に入り登録
+     *
+     * @param  int  $micropostId
+     * @return bool
+     */
+    public function favorite_in($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+
+        if ($exist) {
+            return false;
+        } else {
+            $this->favoriteings()->attach($micropostId);
+            return true;
+        }
+    }
+
+    /**
+     * お切り入り削除
+     *
+     * @param  int  $micropostId
+     * @return bool
+     */
+    public function favorite_out($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+
+        if ($exist) {
+            $this->favoriteings()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function is_favorite($micropostId)
+    {
+        return $this->favoriteings()->where('micropost_id', $micropostId)->exists();
     }
 }
