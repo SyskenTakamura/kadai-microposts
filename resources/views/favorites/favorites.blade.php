@@ -15,9 +15,9 @@
                         <p class="mb-0">{!! nl2br(e($micropost->content)) !!}</p>
                     </div>
                     <div>
-                        {{-- 投稿削除ボタンのフォーム --}}
+                        {{-- お気に入り解除 --}}
                         {!! Form::open(['route' => ['favorites.unfavorite', $micropost->id], 'method' => 'delete']) !!}
-                            {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                            {!! Form::submit('UnfFavorite', ['class' => 'btn btn-success btn-sm']) !!}
                         {!! Form::close() !!}
                     </div>
                 </div>
